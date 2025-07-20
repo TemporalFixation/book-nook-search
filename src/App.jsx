@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './App.css';
+import logo from './assets/logo.png';
 
 function App() {
   const [query, setQuery] = useState({ author: '', title: '', isbn: '' });
@@ -54,7 +55,8 @@ function App() {
 
   return (
     <div className="container">
-      <h1>Book Search</h1>
+      <img src={logo} alt="Logo" style={{ display: 'block', margin: '0 auto 1.5rem auto', width: '120px', height: '120px', objectFit: 'contain', borderRadius: '12px', boxShadow: '0 2px 8px rgba(35,35,91,0.10)' }} />
+      <h1>In the Stacks</h1>
       <form onSubmit={handleSearch} className="search-form">
         <input
           type="text"
