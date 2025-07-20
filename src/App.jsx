@@ -6,9 +6,14 @@ function App() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [includeNonEnglish, setIncludeNonEnglish] = useState(false);
 
   const handleChange = (e) => {
     setQuery({ ...query, [e.target.name]: e.target.value });
+  };
+
+  const handleCheckbox = (e) => {
+    setIncludeNonEnglish(e.target.checked);
   };
 
   const handleSearch = async (e) => {
@@ -31,7 +36,15 @@ function App() {
       const res = await fetch(url);
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
-      setBooks(data.items || []);
+      let items = data.items || [];
+      if (!includeNonEnglish) {
+        items = items.filter(item => {
+          const lang = item.volumeInfo.language;
+          // Google Books API uses ISO 639-1 codes, 'en' for English
+          return !lang || lang === 'en';
+        });
+      }
+      setBooks(items);
     } catch (err) {
       setError('Error fetching book data.');
     } finally {
@@ -64,6 +77,15 @@ function App() {
           value={query.isbn}
           onChange={handleChange}
         />
+        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
+          <input
+            type="checkbox"
+            checked={includeNonEnglish}
+            onChange={handleCheckbox}
+            style={{ width: '1rem', height: '1rem' }}
+          />
+          Include non-English titles
+        </label>
         <button type="submit" disabled={loading}>
           {loading ? 'Searching...' : 'Search'}
         </button>
