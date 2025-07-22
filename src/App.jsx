@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import './App.css';
 import logo from './assets/logo.png';
+import Fuse from 'fuse.js';
 
 function App() {
   const [query, setQuery] = useState({ author: '', title: '', isbn: '' });
@@ -44,6 +45,28 @@ function App() {
           // Google Books API uses ISO 639-1 codes, 'en' for English
           return !lang || lang === 'en';
         });
+      }
+      // --- Fuzzy matching and ranking logic ---
+      if (query.title) {
+        // Prepare Fuse.js options
+        const fuse = new Fuse(items, {
+          keys: [
+            { name: 'volumeInfo.title', weight: 0.7 },
+            { name: 'volumeInfo.subtitle', weight: 0.2 },
+            { name: 'volumeInfo.authors', weight: 0.1 },
+          ],
+          threshold: 0.4, // Lower is stricter
+          includeScore: true,
+        });
+        // Build search pattern: title + author if provided
+        let pattern = query.title;
+        if (query.author) pattern += ' ' + query.author;
+        // Run Fuse search
+        const fuseResults = fuse.search(pattern);
+        // If Fuse returns results, use them; otherwise, fallback to original
+        if (fuseResults.length > 0) {
+          items = fuseResults.map(r => r.item);
+        }
       }
       setBooks(items);
     } catch (err) {
