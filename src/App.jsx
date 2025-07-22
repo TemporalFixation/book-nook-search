@@ -10,6 +10,7 @@ function App() {
   const [error, setError] = useState('');
   const [includeNonEnglish, setIncludeNonEnglish] = useState(false);
   const [includeOldBooks, setIncludeOldBooks] = useState(false);
+  const [searchPerformed, setSearchPerformed] = useState(false);
 
   const handleChange = (e) => {
     setQuery({ ...query, [e.target.name]: e.target.value });
@@ -25,6 +26,7 @@ function App() {
 
   const handleSearch = async (e) => {
     e.preventDefault();
+    setSearchPerformed(true);
     setLoading(true);
     setError('');
     setBooks([]);
@@ -95,7 +97,11 @@ function App() {
     <div className="container">
       <img src={logo} alt="Logo" style={{ display: 'block', margin: '0 auto 1.5rem auto', width: '120px', height: '120px', objectFit: 'contain', borderRadius: '12px', boxShadow: '0 2px 8px rgba(35,35,91,0.10)' }} />
       <h1>In the Stacks</h1>
-      <form onSubmit={handleSearch} className="search-form">
+      <form
+        onSubmit={handleSearch}
+        className={`search-form${searchPerformed ? ' search-floated' : ''}`}
+        style={searchPerformed ? { boxShadow: '0 4px 24px rgba(0,0,0,0.12)' } : {}}
+      >
         <input
           type="text"
           name="author"
@@ -133,14 +139,14 @@ function App() {
             onChange={handleOldBooksCheckbox}
             style={{ width: '1rem', height: '1rem' }}
           />
-          Include Old Ass Books
+          Include Old Ass Books (Pre-1970)
         </label>
         <button type="submit" disabled={loading}>
           {loading ? 'Searching...' : 'Search'}
         </button>
       </form>
       {error && <p className="error">{error}</p>}
-      <div className="results">
+      <div className={`results${searchPerformed ? ' left-justified' : ''}`}>
         {books.length > 0 ? (
           books.map((item, idx) => {
             const book = item.volumeInfo;

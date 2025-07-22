@@ -114,3 +114,23 @@ h1 {
     padding: 1rem 0.5rem;
   }
 }
+
+/* Add styles for floating search form and left-justifying results */
+@media (min-width: 900px) {
+  .search-floated {
+    position: fixed;
+    top: 2.5rem;
+    right: 2.5rem;
+    width: 320px;
+    z-index: 10;
+    background: #fff;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    max-width: 90vw;
+  }
+  .results.left-justified {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
