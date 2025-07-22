@@ -9,6 +9,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [includeNonEnglish, setIncludeNonEnglish] = useState(false);
+  const [includeOldBooks, setIncludeOldBooks] = useState(false);
 
   const handleChange = (e) => {
     setQuery({ ...query, [e.target.name]: e.target.value });
@@ -16,6 +17,10 @@ function App() {
 
   const handleCheckbox = (e) => {
     setIncludeNonEnglish(e.target.checked);
+  };
+
+  const handleOldBooksCheckbox = (e) => {
+    setIncludeOldBooks(e.target.checked);
   };
 
   const handleSearch = async (e) => {
@@ -68,6 +73,16 @@ function App() {
           items = fuseResults.map(r => r.item);
         }
       }
+      // Filter out books published before 1970 unless includeOldBooks is checked
+      if (!includeOldBooks) {
+        items = items.filter(item => {
+          const date = item.volumeInfo.publishedDate;
+          if (!date) return true; // keep if no date
+          // publishedDate can be 'YYYY', 'YYYY-MM', or 'YYYY-MM-DD'
+          const year = parseInt(date.slice(0, 4), 10);
+          return isNaN(year) || year >= 1970;
+        });
+      }
       setBooks(items);
     } catch (err) {
       setError('Error fetching book data.');
@@ -110,6 +125,15 @@ function App() {
             style={{ width: '1rem', height: '1rem' }}
           />
           Include non-English titles
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
+          <input
+            type="checkbox"
+            checked={includeOldBooks}
+            onChange={handleOldBooksCheckbox}
+            style={{ width: '1rem', height: '1rem' }}
+          />
+          Include Old Ass Books
         </label>
         <button type="submit" disabled={loading}>
           {loading ? 'Searching...' : 'Search'}
